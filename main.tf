@@ -14,6 +14,7 @@ module "s3_bucket" {
 module "certification" {
   source = "./modules/certification"
   domain_name = var.domain_name
+
 }
 
 module "api_gateway_config" {
@@ -24,13 +25,17 @@ module "api_gateway_config" {
 module "route53" {
   source = "./modules/route53"
   domain_name = var.domain_name
-  
+  more = module.certification.domain_validation.domain_validation_options
+  alias_name = module.api_gateway_resources.domain_name.domain_name_configuration[0].target_domain_name
+  alias_zone = module.api_gateway_resources.domain_name.domain_name_configuration[0].hosted_zone_id
+  dependency = module.certification
 }
 
 module "api_gateway_resources" {
   source = "./modules/api_gateway_resources"
   domain_name = var.domain_name
   certificate_arn = module.certification.certification
+  api_id = module.api_gateway_config.id
 }
 
 
@@ -97,7 +102,7 @@ module "cdn" {
   ]
 
   viewer_certificate = {
-    acm_certificate_arn = module.api_gateway_resources.certificate_arn
+    acm_certificate_arn = module.certification.certification
     ssl_support_method  = "sni-only"
   }
 

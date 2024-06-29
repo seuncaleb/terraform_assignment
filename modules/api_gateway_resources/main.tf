@@ -9,12 +9,12 @@ resource "aws_apigatewayv2_domain_name" "example" {
 }
 
 resource "aws_apigatewayv2_stage" "example" {
-  api_id = aws_apigatewayv2_api.example.id
+  api_id = var.api_id
   name   = "example-stage"
 }
 
 resource "aws_apigatewayv2_api_mapping" "example" {
-  api_id      = aws_apigatewayv2_api.example.id
+  api_id      = var.api_id
   domain_name = aws_apigatewayv2_domain_name.example.id
   stage       = aws_apigatewayv2_stage.example.id
 }
